@@ -7,9 +7,10 @@
   <img src="https://img.shields.io/badge/clang-18%2B-blue?logo=llvm" alt="Clang 18+" />
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform" />
   <img src="https://img.shields.io/badge/standard-C%2B%2B23-00599C?logo=c%2B%2B" alt="C++23" />
+  <a href="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml"><img src="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
----
+***
 
 ## Castle
 
@@ -17,12 +18,12 @@ A minimal, Cargo inspired C++ project manager written in Rust. Castle scaffolds,
 
 > **Origins.** This project began as [sunless2day/Castle](https://github.com/sunless2day/Castle), a ~200 line Rust learning milestone written in two days. The original `new`, `build`, and `run` commands still work exactly as they did. Everything else in this repository is additive: a demonstration of how far a minimal, well structured foundation can be extended with best practices and a little imagination. Credit and gratitude to the original author for the lovely starting point.
 
----
+***
 
 ## Navigation
 
 | Section | Content |
-| --- | --- |
+| *** | *** |
 | [Features](#features) | All commands and flags |
 | [Quick Start](#quick-start) | Install and run in 30 seconds |
 | [Install](#install) | Platform specific prerequisites |
@@ -33,12 +34,12 @@ A minimal, Cargo inspired C++ project manager written in Rust. Castle scaffolds,
 | [Development](#development) | Build, test, and contribute |
 | [Acknowledgments](#acknowledgments) | Credits and thanks |
 
----
+***
 
 ## Features
 
 | Command | Purpose |
-| --- | --- |
+| *** | *** |
 | `castle new <name>` | Scaffold a project in a new directory |
 | `castle init [name]` | Scaffold a project in the current directory |
 | `castle build` | Compile and link the project |
@@ -53,7 +54,7 @@ A minimal, Cargo inspired C++ project manager written in Rust. Castle scaffolds,
 
 Build time flags: `--release` (debug is the default when absent), `--cxx-standard=20|23|26`, `--backend clang|cmake`, `--asan` / `--tsan` / `--ubsan` / `--msan`, `--pedantic`.
 
----
+***
 
 ## Quick Start
 
@@ -71,14 +72,14 @@ Output: `Hello, world! Your castle stands.`
 
 After the first `castle build`, a `compile_commands.json` appears at the project root. clangd picks it up automatically: no extra configuration needed in VS Code, Neovim, or Helix.
 
----
+***
 
 ## Install
 
 **Prerequisites**
 
 | Requirement | Notes |
-| --- | --- |
+| *** | *** |
 | Rust 1.87 or later | Edition 2024; uses let-chains stabilized in 1.87. `rustup install stable` |
 | clang 18 or later | Used for version probing |
 | clang++ on PATH | Castle compiles and links via the C++ driver so the standard library is linked automatically |
@@ -86,7 +87,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 **Platform instructions**
 
 | Platform | Command |
-| --- | --- |
+| *** | *** |
 | macOS | `xcode-select --install` (Apple clang 21+ covers C++23) |
 | Ubuntu / Debian | `sudo apt install clang-18 clang++-18` |
 | Windows | `choco install llvm` or download from [llvm.org](https://llvm.org) |
@@ -94,7 +95,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 **Optional tools** (detected at runtime, used when present)
 
 | Tool | Used by |
-| --- | --- |
+| *** | *** |
 | cmake | `castle build --backend cmake` |
 | clang-format | `castle fmt` |
 | clang-tidy | `castle tidy` |
@@ -104,7 +105,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 cargo install --path .
 ```
 
----
+***
 
 ## Manifest
 
@@ -128,25 +129,25 @@ sanitizer = "address"      # "address" | "thread" | "undefined" | "memory"
 
 CLI flags override the manifest. `castle build --release --cxx-standard=26` wins over the `[profile]` and `cxx_standard` fields. The `--pedantic` flag only forces warnings on; omitting it preserves whatever the manifest specifies.
 
----
+***
 
 ## Backends
 
 Castle has two interchangeable build backends that share one flag derivation so they never drift apart.
 
 | Backend | How it works | Best for |
-| --- | --- | --- |
+| *** | *** | *** |
 | `clang` (default) | Drives `clang++` directly: one `-c` per translation unit into `build/`, then a final link. Needs only clang. | Minimal setups, quick iteration |
 | `cmake` (opt-in) | Generates a `CMakeLists.txt` from the manifest, then shells out to `cmake --build`. | Multi-file projects, IDE integration |
 
 Choose per project with `backend = "cmake"` in `castle.toml`, or per invocation with `--backend cmake`. Both backends write a `compile_commands.json` to the project root.
 
----
+***
 
 ## Comparison
 
 | | Castle | CMake | Meson | Cargo (Rust) |
-| --- | --- | --- | --- | --- |
+| *** | *** | *** | *** | *** |
 | Language | C++ | C, C++, others | many | Rust |
 | Manifest | `castle.toml` | `CMakeLists.txt` | `meson.build` | `Cargo.toml` |
 | Single command DX | yes | no (configure then build) | yes | yes |
@@ -156,7 +157,7 @@ Choose per project with `backend = "cmake"` in `castle.toml`, or per invocation 
 
 Castle is not a replacement for CMake or Meson. It is a thin, friendly project manager that can drive CMake when you want it.
 
----
+***
 
 ## Roadmap
 
@@ -170,14 +171,14 @@ Documented future work. See `ARCHITECTURE.md` and `CHANGELOG.md` for deeper cont
 - **ccache wiring.** Route the clang backend through `ccache` automatically.
 - **Shell completions and man page.** Via `clap_complete` and `clap_mangen`.
 
----
+***
 
 ## Dependencies
 
 The original Castle had zero dependencies. This expansion adds a small, justified set:
 
 | Crate | Purpose |
-| --- | --- |
+| *** | *** |
 | `clap` (derive) | CLI: subcommands, `--help`, flag parsing |
 | `serde` + `toml` | Parse `castle.toml` with defaults and validation |
 | `serde_json` | Write `compile_commands.json` for clangd |
@@ -187,7 +188,7 @@ The original Castle had zero dependencies. This expansion adds a small, justifie
 
 No async runtime. No heavy build graph library. Castle stays a script at heart.
 
----
+***
 
 ## Development
 
@@ -200,22 +201,22 @@ cargo doc --no-deps --open             # documentation
 
 See `CONTRIBUTING.md` for the module map and instructions on adding a command. See `ARCHITECTURE.md` for a control flow tour of the entire codebase.
 
----
+***
 
 ## CI
 
 | Job | Targets |
-| --- | --- |
+| *** | *** |
 | `check` | macOS, Ubuntu, Windows: fmt, clippy, tests, live round trip |
 | `cross-check` | `x86_64-pc-windows-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`: `cargo check --all-targets` |
 
----
+***
 
 ## Acknowledgments
 
 This project is a demonstration built on [sunless2day/Castle](https://github.com/sunless2day/Castle), a ~200 line C++ project manager written in Rust as a two day learning milestone. The original author's clean, readable design made this expansion possible and enjoyable. All credit for the foundation belongs to them.
 
----
+***
 
 ## License
 
