@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="demo.gif" alt="Castle demo" width="790" />
+  <img src="hero.png" alt="Castle" width="400" />
 </p>
 
 <p align="center">
@@ -7,7 +7,6 @@
   <img src="https://img.shields.io/badge/clang-18%2B-blue?logo=llvm" alt="Clang 18+" />
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform" />
   <img src="https://img.shields.io/badge/standard-C%2B%2B23-00599C?logo=c%2B%2B" alt="C++23" />
-  <a href="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml"><img src="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
 ***
@@ -23,7 +22,7 @@ A minimal, Cargo inspired C++ project manager written in Rust. Castle scaffolds,
 ## Navigation
 
 | Section | Content |
-| *** | *** |
+| --- | --- |
 | [Features](#features) | All commands and flags |
 | [Quick Start](#quick-start) | Install and run in 30 seconds |
 | [Install](#install) | Platform specific prerequisites |
@@ -39,7 +38,7 @@ A minimal, Cargo inspired C++ project manager written in Rust. Castle scaffolds,
 ## Features
 
 | Command | Purpose |
-| *** | *** |
+| --- | --- |
 | `castle new <name>` | Scaffold a project in a new directory |
 | `castle init [name]` | Scaffold a project in the current directory |
 | `castle build` | Compile and link the project |
@@ -79,7 +78,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 **Prerequisites**
 
 | Requirement | Notes |
-| *** | *** |
+| --- | --- |
 | Rust 1.87 or later | Edition 2024; uses let-chains stabilized in 1.87. `rustup install stable` |
 | clang 18 or later | Used for version probing |
 | clang++ on PATH | Castle compiles and links via the C++ driver so the standard library is linked automatically |
@@ -87,7 +86,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 **Platform instructions**
 
 | Platform | Command |
-| *** | *** |
+| --- | --- |
 | macOS | `xcode-select --install` (Apple clang 21+ covers C++23) |
 | Ubuntu / Debian | `sudo apt install clang-18 clang++-18` |
 | Windows | `choco install llvm` or download from [llvm.org](https://llvm.org) |
@@ -95,7 +94,7 @@ After the first `castle build`, a `compile_commands.json` appears at the project
 **Optional tools** (detected at runtime, used when present)
 
 | Tool | Used by |
-| *** | *** |
+| --- | --- |
 | cmake | `castle build --backend cmake` |
 | clang-format | `castle fmt` |
 | clang-tidy | `castle tidy` |
@@ -136,7 +135,7 @@ CLI flags override the manifest. `castle build --release --cxx-standard=26` wins
 Castle has two interchangeable build backends that share one flag derivation so they never drift apart.
 
 | Backend | How it works | Best for |
-| *** | *** | *** |
+| --- | --- | --- |
 | `clang` (default) | Drives `clang++` directly: one `-c` per translation unit into `build/`, then a final link. Needs only clang. | Minimal setups, quick iteration |
 | `cmake` (opt-in) | Generates a `CMakeLists.txt` from the manifest, then shells out to `cmake --build`. | Multi-file projects, IDE integration |
 
@@ -147,7 +146,7 @@ Choose per project with `backend = "cmake"` in `castle.toml`, or per invocation 
 ## Comparison
 
 | | Castle | CMake | Meson | Cargo (Rust) |
-| *** | *** | *** | *** | *** |
+| --- | --- | --- | --- | --- |
 | Language | C++ | C, C++, others | many | Rust |
 | Manifest | `castle.toml` | `CMakeLists.txt` | `meson.build` | `Cargo.toml` |
 | Single command DX | yes | no (configure then build) | yes | yes |
@@ -178,7 +177,7 @@ Documented future work. See `ARCHITECTURE.md` and `CHANGELOG.md` for deeper cont
 The original Castle had zero dependencies. This expansion adds a small, justified set:
 
 | Crate | Purpose |
-| *** | *** |
+| --- | --- |
 | `clap` (derive) | CLI: subcommands, `--help`, flag parsing |
 | `serde` + `toml` | Parse `castle.toml` with defaults and validation |
 | `serde_json` | Write `compile_commands.json` for clangd |
@@ -206,7 +205,7 @@ See `CONTRIBUTING.md` for the module map and instructions on adding a command. S
 ## CI
 
 | Job | Targets |
-| *** | *** |
+| --- | --- |
 | `check` | macOS, Ubuntu, Windows: fmt, clippy, tests, live round trip |
 | `cross-check` | `x86_64-pc-windows-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin`, `aarch64-unknown-linux-gnu`: `cargo check --all-targets` |
 

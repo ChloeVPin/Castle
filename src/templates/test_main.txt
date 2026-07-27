@@ -1,0 +1,25 @@
+// A Castle test. Run with: castle test
+// Plain assertions, no framework required.
+#include <cassert>
+#include <print>
+
+static bool arithmetic() {
+    return (1 + 2) == 3;
+}
+
+static bool strings() {
+    auto s = std::string{"castle"};
+    return s.size() == 6 && s[0] == 'c';
+}
+
+int main() {
+    bool ok = true;
+    ok &= arithmetic();
+    ok &= strings();
+    if (!ok) {
+        std::println("test: FAIL");
+        return 1;
+    }
+    std::println("test: ok (2 checks passed)");
+    return 0;
+}

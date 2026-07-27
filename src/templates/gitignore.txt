@@ -1,0 +1,7 @@
+# Castle build artifacts
+/build/
+/compile_commands.json
+
+# Editor cruft
+.DS_Store
+*.swp

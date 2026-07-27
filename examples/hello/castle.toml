@@ -1,0 +1,13 @@
+# Castle project manifest — the `hello` example.
+# Docs: https://github.com/sunless2day/Castle#the-castletoml-manifest
+
+[package]
+name = "hello"
+version = "0.1.0"
+cxx_standard = 23
+
+[profile]
+opt_level = "0"
+debug_info = true
+warnings_as_errors = false
+pedantic = true

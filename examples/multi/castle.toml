@@ -1,0 +1,16 @@
+# Castle project manifest — the `multi` example.
+# This project opts into the cmake backend (good for multi-file projects
+# and IDEs). Build with: castle build --backend cmake
+
+backend = "cmake"
+
+[package]
+name = "multi"
+version = "0.1.0"
+cxx_standard = 23
+
+[profile]
+opt_level = "0"
+debug_info = true
+warnings_as_errors = false
+pedantic = true

@@ -1,0 +1,6 @@
+# Rust build output
+/target
+
+# Editor cruft
+.DS_Store
+*.swp

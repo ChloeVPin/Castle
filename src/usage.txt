@@ -1,6 +1,0 @@
-This is a very minimal and simple C++ project manager called Castle.
-
-Usage:
-castle new <project_name>: creates a directory with all core components.
-castle build: uses cmake to build your project.
-castle run: compiles and runs your program.

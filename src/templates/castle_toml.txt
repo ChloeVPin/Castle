@@ -1,0 +1,28 @@
+# Castle project manifest.
+# Docs: https://github.com/sunless2day/Castle#the-castletoml-manifest
+#
+# A Castle project is just a directory with a castle.toml. Every field below has
+# a sensible default, so you can delete this file and Castle will still work.
+
+# Build backend: "clang" (default, minimal — needs only clang) or "cmake"
+# (generates a CMake build, handy for multi-file projects and IDEs).
+# backend = "clang"
+
+[package]
+name = "{{PROJECT_NAME}}"
+version = "0.1.0"
+# C++ standard: 23 (default), 20, or 26 (opt-in; needs a supporting clang).
+cxx_standard = 23
+
+[profile]
+# Optimization level: "0" (debug, default), "1", "2", "3", or "s" (size).
+opt_level = "0"
+# Emit debug info (-g) in non-release builds.
+debug_info = true
+# Treat compiler warnings as errors (-Werror).
+warnings_as_errors = false
+# Enable -Wpedantic for extra pedantic warnings.
+pedantic = true
+# Sanitizer: one of "address", "thread", "undefined", "memory".
+# Leave commented out to disable. CLI flags like `--asan` override this.
+# sanitizer = "address"
