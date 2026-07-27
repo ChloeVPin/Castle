@@ -2,6 +2,6 @@
 ---
 ## Usage
 
-Simply build the binary and it with `castle`. That will show you available options.
+Simply build the binary and run it with `castle`. That will show you available options.
 
 > **Note:** I do not expect this project to work on Windows machines or versions of Clang older than clang 18.
