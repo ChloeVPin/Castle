@@ -28,7 +28,6 @@ pub fn run(opts: BuildOpts<'_>, printer: &Printer) -> Result<()> {
         opts.backend,
     )?;
 
-    // Verify clang is new enough for the chosen standard.
     let min = min_clang_for(
         flags
             .std_flag
@@ -37,24 +36,18 @@ pub fn run(opts: BuildOpts<'_>, printer: &Printer) -> Result<()> {
             .unwrap_or(23),
     );
     let clang = require_clang(min)?;
-    let driver = if backend == Backend::Clang {
-        "clang++"
-    } else {
-        "cmake"
-    };
+    let profile = opts.profile.unwrap_or("debug");
+    let standard = flags.std_flag.trim_start_matches("-std=");
     printer.info(&format!(
-        "using clang {} ({}, via {driver}), backend = {}",
+        "clang {}, {standard}, {profile}, {} backend",
         clang.major,
-        flags.std_flag,
         backend_label(backend)
     ));
 
     backend.build(&project, &flags, printer)?;
 
-    // ccache hint: Castle's clang backend doesn't yet route through ccache,
-    // so point the user at the standard env var if it's installed.
     if crate::toolchain::on_path("ccache") && backend == Backend::Clang {
-        printer.hint("ccache detected — set `CCACHE_PREFIX=ccache` (or use the cmake backend with CMAKE_CXX_COMPILER_LAUNCHER) to speed up rebuilds");
+        printer.hint("ccache detected; use the CMake backend with CMAKE_CXX_COMPILER_LAUNCHER to enable it");
     }
 
     printer.success("build finished");
