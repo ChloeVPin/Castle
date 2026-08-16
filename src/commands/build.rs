@@ -47,7 +47,9 @@ pub fn run(opts: BuildOpts<'_>, printer: &Printer) -> Result<()> {
     backend.build(&project, &flags, printer)?;
 
     if crate::toolchain::on_path("ccache") && backend == Backend::Clang {
-        printer.hint("ccache detected; use the CMake backend with CMAKE_CXX_COMPILER_LAUNCHER to enable it");
+        printer.hint(
+            "ccache detected; use the CMake backend with CMAKE_CXX_COMPILER_LAUNCHER to enable it",
+        );
     }
 
     printer.success("build finished");
