@@ -72,7 +72,8 @@ impl Printer {
     /// An error, printed to stderr.
     pub fn error(&self, msg: &str) {
         let prefix = self.paint(true, &[BOLD, RED], "Castle:");
-        eprintln!("{prefix} {msg}");
+        let label = self.paint(true, &[RED], "error:");
+        eprintln!("{prefix} {label} {msg}");
     }
 
     /// A dimmed hint line (Cargo-style), printed to stderr.
