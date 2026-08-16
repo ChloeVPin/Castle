@@ -49,24 +49,20 @@ pub fn run(cxx_override: Option<u32>, printer: &Printer) -> Result<()> {
     cmd.args(flags.all()).args(&sources).arg("-o").arg(&bin);
     shell::run_step(
         &mut cmd,
-        &format!("clang compile+link {} test source(s)", sources.len()),
+        &format!("compile+link {} test source(s)", sources.len()),
         printer,
     )?;
 
     printer.step("run tests");
-    let status = Command::new(&bin).status();
-    match status {
-        Ok(s) if s.success() => {
+    match Command::new(&bin).status() {
+        Ok(status) if status.success() => {
             printer.success("tests passed");
             Ok(())
         }
-        Ok(s) => {
-            printer.error(&format!("tests failed (exit {})", s.code().unwrap_or(1)));
-            Err(CastleError::BackendFailed {
-                label: "tests".to_string(),
-                code: s.code().unwrap_or(1),
-            })
-        }
+        Ok(status) => Err(CastleError::BackendFailed {
+            label: "tests".to_string(),
+            code: status.code().unwrap_or(1),
+        }),
         Err(e) => Err(CastleError::Io(e)),
     }
 }
