@@ -7,7 +7,7 @@
 use std::process::Command;
 
 use crate::commands::common::{min_clang_for, resolve_build_config};
-use crate::error::Result;
+use crate::error::{CastleError, Result};
 use crate::output::Printer;
 use crate::project::Project;
 use crate::shell;
@@ -33,8 +33,7 @@ pub fn run(cxx_override: Option<u32>, printer: &Printer) -> Result<()> {
         let mut cmd = Command::new("clang++");
         cmd.args(flags.all()).arg("-fsyntax-only").arg(src);
         let label = format!("check {}", pretty_rel(&project.root, src));
-        if let Err(e) = shell::run_step(&mut cmd, &label, printer) {
-            printer.error(&e.to_string());
+        if shell::run_step(&mut cmd, &label, printer).is_err() {
             failed += 1;
         }
     }
@@ -42,9 +41,8 @@ pub fn run(cxx_override: Option<u32>, printer: &Printer) -> Result<()> {
         printer.success(&format!("{} source(s) checked, no errors", sources.len()));
         Ok(())
     } else {
-        printer.error(&format!("{failed} source(s) failed to check"));
-        Err(crate::error::CastleError::BackendFailed {
-            label: "check".to_string(),
+        Err(CastleError::BackendFailed {
+            label: format!("check ({failed} source(s) failed)"),
             code: 1,
         })
     }
