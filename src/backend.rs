@@ -150,14 +150,15 @@ fn sanitize_flag(name: &str) -> String {
     }
 }
 
-/// Probe for an executable at `<build>/<name>` or `<build>/bin`.
+/// Probe common single- and multi-config CMake locations for a built executable.
 ///
-/// Binaries carry a `.exe` suffix on Windows, so we probe both the bare
-/// name and the `.exe`-suffixed variant.
+/// Binaries carry a `.exe` suffix on Windows. Visual Studio and other
+/// multi-config CMake generators also place runtime targets under directories
+/// such as `build/Debug` or `build/Release`.
 pub fn find_built_binary(project: &Project, name: &str) -> Option<PathBuf> {
     let build = project.build_dir();
     let exe_name = format!("{name}{}", std::env::consts::EXE_SUFFIX);
-    let candidates = [
+    let mut candidates = vec![
         build.join(&exe_name),
         build.join("bin"),
         build.join("bin").join(&exe_name),
@@ -165,6 +166,14 @@ pub fn find_built_binary(project: &Project, name: &str) -> Option<PathBuf> {
         build.join(name),
         build.join("bin").join(name),
     ];
+
+    for config in ["Debug", "Release", "RelWithDebInfo", "MinSizeRel"] {
+        candidates.push(build.join(config).join(&exe_name));
+        candidates.push(build.join(config).join(name));
+        candidates.push(build.join("bin").join(config).join(&exe_name));
+        candidates.push(build.join("bin").join(config).join(name));
+    }
+
     candidates.into_iter().find(|p| p.is_file())
 }
 
@@ -238,13 +247,20 @@ fn cmake_build(project: &Project, flags: &Flags, printer: &Printer) -> Result<()
     let build = project.build_dir();
     std::fs::create_dir_all(&build)?;
     let mut configure = Command::new("cmake");
-    configure
-        .args(["-S", "."])
-        .arg("-B")
-        .arg(&build)
-        // On Windows cmake defaults to the MSVC toolchain; force clang++
-        // so the compiler matches what Castle's toolchain check expects.
-        .arg("-DCMAKE_CXX_COMPILER=clang++");
+    configure.args(["-S", "."]).arg("-B").arg(&build);
+
+    // Visual Studio is CMake's default generator on Windows, but it ignores
+    // CMAKE_EXPORT_COMPILE_COMMANDS and may select MSVC even when clang++ is
+    // requested. Prefer single-config Ninja for fresh build trees when it is
+    // available; existing CMake build trees retain their configured generator.
+    if cfg!(windows)
+        && crate::toolchain::on_path("ninja")
+        && !build.join("CMakeCache.txt").is_file()
+    {
+        configure.args(["-G", "Ninja"]);
+    }
+
+    configure.arg("-DCMAKE_CXX_COMPILER=clang++");
     shell::run_step(&mut configure, "cmake configure", printer)?;
 
     let mut make = Command::new("cmake");
@@ -399,5 +415,20 @@ mod tests {
     #[test]
     fn backend_resolve_defaults_to_clang() {
         assert_eq!(Backend::resolve(None, None).unwrap(), Backend::Clang);
+    }
+
+    #[test]
+    fn find_built_binary_supports_cmake_multiconfig_layout() {
+        let tmp = tempfile::tempdir().unwrap();
+        let project = Project {
+            root: tmp.path().to_path_buf(),
+            manifest: Some(named_manifest("demo")),
+        };
+        let config_dir = project.build_dir().join("Debug");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        let bin = config_dir.join(format!("demo{}", std::env::consts::EXE_SUFFIX));
+        std::fs::write(&bin, b"").unwrap();
+
+        assert_eq!(find_built_binary(&project, "demo"), Some(bin));
     }
 }
