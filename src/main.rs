@@ -1,4 +1,4 @@
-//! 🏰 Castle — a minimal Cargo-inspired C++ project manager.
+//! Castle — a minimal Cargo-inspired C++ project manager.
 //!
 //! Castle scaffolds, builds, and runs C++ projects with clang (≥ 18) and
 //! C++23 by default. See [`cli`] for the command surface and [`backend`] for

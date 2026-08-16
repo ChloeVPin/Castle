@@ -3,11 +3,21 @@
 All notable changes to Castle are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased] — the "AI magic" expansion
+## [Unreleased]
 
-A ground-up expansion of the original 2-day, ~200-line project manager into a
-small but real C++ toolchain helper. The original `new`/`build`/`run` commands
-remain backward compatible; everything below is additive.
+Expansion of the original 2-day, ~200-line project manager into a small C++
+toolchain helper. The original `new`/`build`/`run` commands remain backward
+compatible; everything below is additive.
+
+### Changed — presentation
+- README first screen now states what Castle is, shows a `Castle:` transcript,
+  and uses a live CI badge. Origin credit lives under Acknowledgments.
+- Hero tagline is "Cargo for small C++ projects." Added a 1280×640 social
+  preview at `.github/social-preview.png`.
+- Errors print `Castle: error: …`, matching the existing `warning:` label.
+- `Cargo.toml` now has description, license, repository, keywords, and
+  `rust-version = "1.87"`.
+- Dropped the decorative castle emoji from clap / rustdoc about text.
 
 ### Added — Tier 1 (foundations)
 - **`clap` derive CLI** with real `--help`, `--version` (`castle -V`), and
