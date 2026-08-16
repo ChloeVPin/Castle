@@ -1,83 +1,77 @@
 # Contributing to Castle
 
-Thanks for hacking on the keep! Castle is intentionally small, so most
-contributions should stay small too.
+Castle is intentionally small. Contributions should preserve that constraint unless a larger change has a clear project-level justification.
 
 ## Setup
 
 ```bash
 git clone <repo>
 cd Castle
-cargo install --path .          # optional: put `castle` on your PATH
+cargo install --path .
 ```
 
-Prerequisites: a stable Rust toolchain **≥ 1.87** (edition 2024; the code uses
-let-chains, stabilized in 1.87), clang ≥ 18 *and*
-`clang++` on `PATH`. See the README for platform install notes.
+Prerequisites:
 
-## The loop
+- stable Rust **1.88 or later** (edition 2024; Castle uses let-chains)
+- Clang **18 or later**
+- `clang++` on `PATH`
+
+See the README for platform installation notes.
+
+## Development loop
 
 ```bash
-cargo fmt                              # format
-cargo clippy --all-targets -- -D warnings   # lint (warnings are errors here)
-cargo test                             # unit tests + end-to-end round-trip
-cargo doc --no-deps --open             # docs
+cargo fmt -- --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+cargo doc --no-deps
 ```
 
-`cargo test` includes `tests/round_trip.rs`, which actually compiles and runs a
-scaffolded C++ project through the `castle` binary — so you need a working
-`clang++` for the full suite to pass.
+`cargo test` includes `tests/round_trip.rs`, which scaffolds, compiles, and runs a real C++ project through the built `castle` binary. A working `clang++` is required for the full suite.
 
-## Where things live
+## Repository map
 
-See `ARCHITECTURE.md` for the full module map. In short:
+See `ARCHITECTURE.md` for the full module map. The main extension points are:
 
-- `src/cli.rs` — the clap command/flag definitions.
-- `src/commands/<name>.rs` — one file per subcommand.
-- `src/commands/common.rs` — shared helpers (`resolve_build_config`,
-  `validate_project_name`, `min_clang_for`).
-- `src/backend.rs` — the clang/cmake backends and `Flags` derivation.
-- `src/templates/` — the `.txt` files baked in via `include_str!`.
+- `src/cli.rs` — clap command and flag definitions.
+- `src/commands/<name>.rs` — one handler per subcommand.
+- `src/commands/common.rs` — shared configuration and validation helpers.
+- `src/backend.rs` — direct Clang and CMake backends plus shared flag derivation.
+- `src/output.rs` — terminal output policy and `NO_COLOR`/TTY behavior.
+- `src/templates/` — text templates embedded with `include_str!`.
 
-## How to add a command
+## Adding a command
 
-1. **Define the CLI** in `src/cli.rs`: add a variant to the `Command` enum with
-   its args/flags (clap derive).
-2. **Create the handler** at `src/commands/<name>.rs` with a `pub fn run(...)`
-   that returns `error::Result<()>`. Use `Printer` for all output and
-   `shell::run_step` for subprocesses.
-3. **Register it** in `src/commands/mod.rs` (`pub mod <name>;` and a
-   `pub use <name>::run as run_<name>;`).
-4. **Dispatch it** in `src/main.rs`'s `dispatch()`.
-5. **Test it**: add unit tests for pure logic; extend `tests/round_trip.rs` if
-   it has an end-to-end story.
-6. **Document it**: add a row to the README feature table and a CHANGELOG entry.
+1. Define the CLI surface in `src/cli.rs`.
+2. Create `src/commands/<name>.rs` with a `pub fn run(...) -> error::Result<()>` handler.
+3. Register the module and re-export in `src/commands/mod.rs`.
+4. Dispatch it from `src/main.rs`.
+5. Add unit tests for pure logic and extend `tests/round_trip.rs` when the command has an end-to-end workflow.
+6. Update README documentation and the changelog when the user-facing surface changes.
 
-## How to add a template
+Use `Printer` for Castle-owned terminal output and `shell::run_step` for subprocess steps. Compiler and tool diagnostics should continue to inherit their normal streams rather than being reformatted by Castle.
 
-1. Drop a `.txt` file into `src/templates/` (use `{{PLACEHOLDER}}` markers).
-2. Add `pub const NAME: &str = include_str!("templates/<file>.txt");` in
-   `src/templates.rs`.
-3. Use `templates::render(NAME, &[("KEY", value)])` to substitute placeholders.
-4. Add a smoke assertion to `templates::tests::all_templates_are_embedded`.
+## Adding a template
 
-## Style
+1. Add a `.txt` file under `src/templates/` using `{{PLACEHOLDER}}` markers when substitution is required.
+2. Embed it from `src/templates.rs` with `include_str!`.
+3. Render substitutions through `templates::render`.
+4. Add or update template smoke tests.
 
-- Keep the `Castle:` voice in all user-facing messages (use `Printer`).
-- No `unwrap`/`expect` on user-facing paths — use `?` with typed errors.
-- New public items get rustdoc.
-- Keep diffs reviewable; prefer small, well-named modules over megafiles.
-- Run `cargo fmt` and `cargo clippy --all-targets -- -D warnings` before
-  committing.
+## Style and compatibility
+
+- Keep user-facing output concise and use the established `Castle:` prefix through `Printer`.
+- Preserve `NO_COLOR`, `CI`, `TERM=dumb`, and TTY behavior.
+- Avoid `unwrap` and `expect` on user-facing paths; return typed errors instead.
+- Add rustdoc to new public items.
+- Prefer small, reviewable modules and focused diffs.
+- Do not add a dependency solely for terminal appearance or decoration.
+- Keep direct Clang as the default backend and CMake as the explicit escape hatch unless a change intentionally revisits that product decision.
 
 ## Commit messages
 
-Use conventional prefixes: `feat(cli): …`, `fix(backend): …`, `docs: …`,
-`test: …`, `chore: …`. Keep the subject line short.
+Use short conventional prefixes such as `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, and `chore:`. Add a scope only when it improves clarity.
 
 ## Scope
 
-If you're adding something big (a new backend, dependency resolution, C++23
-modules), open an issue first. Castle's whole pitch is *minimal but
-essential* — we'd rather ship a small, honest slice than a sprawling half-done
-feature.
+Open an issue before starting a substantial new backend, dependency-resolution system, workspace model, or C++ modules implementation. Castle should ship a small complete capability rather than a broad incomplete one.
