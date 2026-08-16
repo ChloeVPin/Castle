@@ -14,11 +14,11 @@ pub fn run(printer: &Printer) -> Result<()> {
                 .lines()
                 .next()
                 .unwrap_or("clang (version unknown)");
-            printer.info(&format!("clang: {ver_line}"));
-            printer.info("default C++ standard: c++23");
+            printer.plain(&format!("  clang       {ver_line}"));
+            printer.plain("  C++ default c++23");
             for tool in ["clang++", "cmake", "ccache", "clang-format", "clang-tidy"] {
                 if crate::toolchain::on_path(tool) {
-                    printer.info(&format!("{tool}: available"));
+                    printer.plain(&format!("  {tool:<11} available"));
                 }
             }
         }
