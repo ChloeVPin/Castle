@@ -15,15 +15,14 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
-      # ---- Ubuntu: clang ≥ 18 via llvm.org apt ----
-      - name: Install clang ≥ 18 (Ubuntu)
+      - name: Install clang >= 18 (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           set -e
@@ -39,20 +38,17 @@ jobs:
           clang --version
           clang++ --version
 
-      # ---- macOS: clang is already present (Xcode CLT) ----
       - name: Verify clang on macOS
         if: matrix.os == 'macos-latest'
         run: |
           clang --version
           clang++ --version
 
-      # ---- Windows: LLVM via chocolatey ----
       - name: Install LLVM (Windows)
         if: matrix.os == 'windows-latest'
         run: |
           choco install llvm --version=18.1.8 --yes --no-progress
           echo "$env:ProgramFiles\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          # Also install cmake (not bundled with llvm choco package)
           choco install cmake --yes --no-progress
         shell: pwsh
 
@@ -63,7 +59,6 @@ jobs:
           clang++ --version
         shell: pwsh
 
-      # ---- Rust checks (all OS) ----
       - name: cargo fmt --check
         run: cargo fmt -- --check
 
@@ -73,7 +68,6 @@ jobs:
       - name: cargo test
         run: cargo test
 
-      # ---- Live round-trip: clang backend (all OS) ----
       - name: Sample round-trip (clang backend)
         run: |
           cargo install --path . --force
@@ -86,11 +80,6 @@ jobs:
           castle clean --force
         shell: bash
 
-      # ---- Live round-trip: cmake backend + fmt + tidy ----
-      # fmt/tidy require clang-format / clang-tidy. The Ubuntu and Windows
-      # install steps above put them on PATH, but macOS Xcode CLT only
-      # provides clang/clang++ (not the extra LLVM tools), so this step is
-      # gated to non-macOS.
       - name: Sample round-trip (cmake backend + fmt + tidy)
         if: matrix.os != 'macos-latest'
         run: |
@@ -103,10 +92,7 @@ jobs:
           castle clean --force
         shell: bash
 
-  # ── Cross-compile check ─────────────────────────────────────────────
-  # Verifies Castle type-checks for every tier-1 platform (including
-  # ARM) without needing platform linkers.  `cargo check` only needs the
-  # target's std via `rustup target add` — no SDK or cross-linker required.
+  # Type-check selected cross-platform targets without requiring their linkers.
   cross-check:
     name: cross-check (${{ matrix.target }})
     runs-on: ubuntu-latest
@@ -119,7 +105,7 @@ jobs:
           - aarch64-apple-darwin
           - aarch64-unknown-linux-gnu
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
