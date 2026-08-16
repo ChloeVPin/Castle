@@ -1,12 +1,8 @@
-//! 🏰 Castle — a minimal Cargo-inspired C++ project manager.
+//! Castle — a minimal Cargo-inspired C++ project manager.
 //!
-//! Castle scaffolds, builds, and runs C++ projects with clang (≥ 18) and
+//! Castle scaffolds, builds, and runs C++ projects with Clang (>= 18) and
 //! C++23 by default. See [`cli`] for the command surface and [`backend`] for
-//! the clang/cmake build backends.
-//!
-//! Originally ~200 lines written in two days as a learning milestone; this
-//! expansion keeps that readable, hackable spirit while adding essence and
-//! best practice.
+//! the direct Clang and CMake build backends.
 
 mod backend;
 mod cli;
@@ -56,7 +52,6 @@ fn dispatch(cmd: &Command, printer: &Printer) -> error::Result<()> {
                 cxx_standard: *cxx_standard,
                 backend: backend.as_deref(),
                 sanitizer: cmd.sanitizer_override(),
-                // `--pedantic` only forces ON; absence preserves the manifest default.
                 pedantic: if *pedantic { Some(true) } else { None },
             },
             printer,
@@ -88,7 +83,7 @@ fn dispatch(cmd: &Command, printer: &Printer) -> error::Result<()> {
     }
 }
 
-/// Print a contextual hint for some errors (Cargo-style).
+/// Print a contextual hint for errors that have a clear next action.
 fn hint_for(e: &error::CastleError, printer: &Printer) {
     use error::CastleError;
     match e {
