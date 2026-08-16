@@ -1,0 +1,50 @@
+name: Bug report
+description: Report reproducible Castle behavior that appears incorrect.
+title: "bug: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a Castle bug. Include enough environment detail to reproduce it without guessing.
+  - type: input
+    id: castle-version
+    attributes:
+      label: Castle version
+      placeholder: "castle 0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Ubuntu 24.04, macOS 15, Windows 11"
+    validations:
+      required: true
+  - type: input
+    id: clang-version
+    attributes:
+      label: Clang version
+      placeholder: "clang version 18.x"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and project context
+      description: Include the Castle command, relevant castle.toml fields, and the smallest project setup that reproduces the problem.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include complete Castle output and compiler/tool diagnostics when relevant.
+    validations:
+      required: true
