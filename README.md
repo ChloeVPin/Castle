@@ -1,244 +1,162 @@
 <p align="center">
-  <img src="hero.png" alt="Castle" width="400" />
+  <img src="hero.png" alt="Castle — a minimal C++ project manager" width="400" />
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/rust-1.87%2B-orange?logo=rust" alt="Rust 1.87+" />
-  <img src="https://img.shields.io/badge/clang-18%2B-blue?logo=llvm" alt="Clang 18+" />
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform" />
-  <img src="https://img.shields.io/badge/standard-C%2B%2B23-00599C?logo=c%2B%2B" alt="C++23" />
-</p>
+# Castle
 
----
+Cargo-inspired project management for small C++ executables, with direct Clang builds by default and CMake when you need it.
 
-## Castle
+Castle keeps the common loop small: scaffold a project, build it, run it, test it, and keep clangd tooling in sync without introducing a separate build-graph dependency.
 
-Castle is a small C++ project manager written in Rust. Its command structure is similar to Cargo.
+```text
+$ castle new hello
+Castle: created project `hello`
+  hint: cd into it and run `castle build`
 
-Castle can create, build, test, and run C++ projects. By default, it uses Clang and C++23. It also supports build profiles, sanitizers, clangd, watch mode, formatting, static analysis, and CMake.
+$ cd hello && castle run
+Castle: clang 18, c++23, debug, clang backend
+Castle: compile src/main.cpp
+Castle: link build/hello
+Castle: build finished
+Castle: run build/hello
+Hello, world! Your castle stands.
+```
 
-> **Project origin**  
-> This project started from [sunless2day/Castle](https://github.com/sunless2day/Castle). The original project was a small Rust learning project with the `new`, `build`, and `run` commands. These commands continue to work. This repository adds the other functions that are described below. Credit for the original foundation belongs to the original author.
+## Why Castle
 
----
+- **Direct Clang by default.** Small projects compile and link through `clang++` without a generated build system.
+- **One project workflow.** `new`, `build`, `run`, `check`, `test`, `fmt`, `tidy`, and `clean` use one CLI and one manifest.
+- **CMake when needed.** Switch the backend per project or per command without changing Castle's flag derivation.
+- **clangd-ready.** Both backends maintain `compile_commands.json` at the project root.
 
-## Navigation
+Castle is deliberately narrower than CMake or Meson. It is intended for small executable projects that benefit from a Cargo-like workflow, not as a replacement for a general-purpose build system.
 
-| Section | Content |
-|---|---|
-| [Features](#features) | Commands and flags |
-| [Quick Start](#quick-start) | Basic installation and use |
-| [Install](#install) | Platform requirements |
-| [Manifest](#manifest) | `castle.toml` reference |
-| [Backends](#backends) | Clang and CMake backends |
-| [Comparison](#comparison) | Comparison with other tools |
-| [Roadmap](#roadmap) | Planned work |
-| [Development](#development) | Build, test, and contribution commands |
-| [Acknowledgments](#acknowledgments) | Project credits |
+## Install
 
----
+### Requirements
 
-## Features
+- Rust **1.88 or later**
+- Clang **18 or later**
+- `clang++` on `PATH`
 
-| Command | Function |
-|---|---|
-| `castle new <name>` | Create a project in a new directory. |
-| `castle init [name]` | Create a project in the current directory. |
-| `castle build` | Compile and link the project. |
-| `castle run [args]` | Build and run the binary. Supports `--watch`. |
-| `castle check` | Run a fast `-fsyntax-only` check without linking. |
-| `castle test` | Build and run files under `tests/`. |
-| `castle clean [--force]` | Remove `build/` and `compile_commands.json`. |
-| `castle fmt` | Run `clang-format` on `src/` and `tests/`. |
-| `castle tidy` | Run `clang-tidy` with `compile_commands.json`. |
-| `castle version` | Print the Castle version and detected toolchain information. |
-| `castle --help` | List commands and descriptions. |
+Platform examples:
 
-Build flags:
+```bash
+# macOS
+xcode-select --install
 
-- `--release`
-- `--cxx-standard=20|23|26`
-- `--backend clang|cmake`
-- `--asan`
-- `--tsan`
-- `--ubsan`
-- `--msan`
-- `--pedantic`
+# Ubuntu / Debian with LLVM 18 packages configured
+sudo apt install clang-18
 
-Debug mode is the default when you do not use `--release`.
+# Windows
+choco install llvm
+```
 
----
-
-## Quick Start
+Install Castle from a checkout:
 
 ```bash
 cargo install --path .
-export PATH="$HOME/.cargo/bin:$PATH"
+```
 
+Optional tools are CMake for the CMake backend, `clang-format` for `castle fmt`, and `clang-tidy` for `castle tidy`.
+
+## Quick start
+
+```bash
 castle new hello
 cd hello
 castle build
 castle run
 ```
 
-Output:
+After the first build, Castle writes `compile_commands.json` at the project root for clangd-compatible editors.
 
-```text
-Hello, world! Your castle stands.
-```
+## Commands
 
-After the first `castle build`, Castle writes `compile_commands.json` in the project root. clangd reads this file automatically. No extra configuration is necessary in VS Code, Neovim, or Helix.
-
----
-
-## Install
-
-### Requirements
-
-| Requirement | Notes |
+| Command | Purpose |
 |---|---|
-| Rust 1.87 or later | Uses Rust edition 2024 and let-chains. Run `rustup install stable`. |
-| Clang 18 or later | Castle uses Clang for version detection. |
-| `clang++` on `PATH` | Castle uses the C++ driver to compile and link the standard library. |
+| `castle new <name>` | Create a project in a new directory. |
+| `castle init [name]` | Create a project in the current directory. |
+| `castle build` | Compile and link the project. |
+| `castle run [args]` | Build and run the binary; supports `--watch`. |
+| `castle check` | Run `-fsyntax-only` over project sources. |
+| `castle test` | Build and run files under `tests/`. |
+| `castle clean [--force]` | Remove build artifacts and `compile_commands.json`. |
+| `castle fmt` | Run `clang-format` on `src/` and `tests/`. |
+| `castle tidy` | Run `clang-tidy` using `compile_commands.json`. |
+| `castle version` | Print Castle and detected toolchain information. |
 
-### Platform Commands
+Common build flags include `--release`, `--cxx-standard=20|23|26`, `--backend clang|cmake`, sanitizer flags, and `--pedantic` for `-Wpedantic`.
 
-| Platform | Command |
-|---|---|
-| macOS | `xcode-select --install` |
-| Ubuntu or Debian | `sudo apt install clang-18 clang++-18` |
-| Windows | `choco install llvm` or download LLVM from [llvm.org](https://llvm.org) |
+## Configuration
 
-### Optional Tools
-
-| Tool | Used by |
-|---|---|
-| CMake | `castle build --backend cmake` |
-| clang-format | `castle fmt` |
-| clang-tidy | `castle tidy` |
-| ccache | Castle can identify it and show a build hint. |
-
-Install Castle:
-
-```bash
-cargo install --path .
-```
-
----
-
-## Manifest
-
-Castle has defaults for all fields. A project without `castle.toml` can still build. The `castle new` and `castle init` commands create a commented manifest.
+`castle.toml` is optional; Castle has defaults for all fields. `castle new` and `castle init` create a commented manifest.
 
 ```toml
-backend = "clang"          # "clang" or "cmake"
+backend = "clang"
 
 [package]
-name = "hello"             # Output binary name
-version = "0.1.0"          # Informational version
-cxx_standard = 23          # 20, 23, or 26
+name = "hello"
+version = "0.1.0"
+cxx_standard = 23
 
 [profile]
-opt_level = "0"            # "0", "1", "2", "3", or "s"
-debug_info = true          # Add -g in non-release builds
+opt_level = "0"
+debug_info = true
 warnings_as_errors = false
-pedantic = true            # Add -Wpedantic
-sanitizer = "address"      # "address", "thread", "undefined", or "memory"
+pedantic = true
 ```
 
-CLI flags override the manifest. For example, `castle build --release --cxx-standard=26` overrides the profile and `cxx_standard` values.
-
-The `--pedantic` flag turns on pedantic warnings. When you omit this flag, Castle uses the manifest value.
-
----
+CLI flags override manifest values. See [docs/configuration.md](docs/configuration.md) for the full manifest and sanitizer reference.
 
 ## Backends
 
-Castle has two build backends. Both backends use the same flag-generation logic.
-
-| Backend | Operation | Recommended use |
+| Backend | What it does | Best fit |
 |---|---|---|
-| `clang` | Calls `clang++` directly. It compiles each translation unit to `build/` and then links the binary. | Small projects and quick development |
-| `cmake` | Creates a `CMakeLists.txt` file and runs `cmake --build`. | Multi-file projects and IDE integration |
+| `clang` | Calls `clang++` directly, compiles translation units into `build/`, then links. | Small projects and fast iteration. |
+| `cmake` | Generates `CMakeLists.txt`, configures CMake, and invokes `cmake --build`. | Projects that need CMake or broader IDE/build-system integration. |
 
-Set `backend = "cmake"` in `castle.toml`, or use `--backend cmake` for one command. Both backends write `compile_commands.json` to the project root.
+Set `backend = "cmake"` in `castle.toml`, or use `--backend cmake` for one command. Both backends use the same Castle flag derivation and maintain `compile_commands.json`.
 
----
+## Where Castle fits
 
-## Comparison
+| | Raw Clang | Castle | CMake |
+|---|---|---|---|
+| Project scaffolding | Manual | Built in | Manual / external |
+| Direct compiler workflow | Yes | Default | No |
+| Repeatable project configuration | Scripts / flags | `castle.toml` | `CMakeLists.txt` |
+| Build command | Manual invocation | `castle build` | `cmake --build <dir>` after configuration |
+| `compile_commands.json` | Manual | Maintained by Castle | Available through CMake configuration |
+| Scope | Compiler driver | Small project manager | General-purpose build system |
 
-| Capability | Castle | CMake | Meson | Cargo |
-|---|---|---|---|---|
-| Main language | C++ | C, C++, and others | Multiple | Rust |
-| Manifest | `castle.toml` | `CMakeLists.txt` | `meson.build` | `Cargo.toml` |
-| Single build command | Yes | No | Yes | Yes |
-| Project creation | Yes | No | Yes | Yes |
-| clangd configuration | Writes `compile_commands.json` | Requires a flag | Yes | Not applicable |
-| Scope | Small and opinionated | Full build system | Full build system | Full Rust project manager |
+## Documentation
 
-Castle does not replace CMake or Meson. It provides a smaller interface and can use CMake as a backend.
-
----
-
-## Roadmap
-
-See `ARCHITECTURE.md` and `CHANGELOG.md` for more information.
-
-- **Dependencies**: Add `castle add <git-url>` with CMake `FetchContent`.
-- **Libraries**: Add `castle new --lib`, header-only and compiled libraries, and a `[targets]` table.
-- **Templates**: Add `castle new --template=<name>` with a user `templates/` directory.
-- **Workspaces**: Add multi-project `[workspace]` support.
-- **C++23 modules**: Add dependency scanning for `import` statements and BMI build order.
-- **ccache**: Add automatic ccache use for the Clang backend.
-- **Shell completions and manual page**: Use `clap_complete` and `clap_mangen`.
-
-C++23 module support is a long-term goal and can require substantial compiler-specific work.
-
----
-
-## Dependencies
-
-| Crate | Function |
+| Document | Purpose |
 |---|---|
-| `clap` | Parse commands, flags, and help text. |
-| `serde` and `toml` | Parse `castle.toml` and apply defaults. |
-| `serde_json` | Write `compile_commands.json`. |
-| `thiserror` | Define typed Castle errors. |
-| `notify` | Rebuild after file changes in watch mode. |
-| `tempfile` | Create temporary projects for integration tests. |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Module map, control flow, and implementation boundaries. |
+| [docs/configuration.md](docs/configuration.md) | Manifest, profiles, sanitizers, and backend configuration. |
+| [examples/](examples/) | Default and CMake-backed sample projects. |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Local development and contribution workflow. |
+| [CHANGELOG.md](CHANGELOG.md) | Notable project changes. |
 
-Castle does not use an asynchronous runtime or a large build-graph library.
+## Scope
 
----
+Castle focuses on small C++ executable projects and a predictable local toolchain workflow. Dependency resolution, workspaces, library/package publishing, and full C++ module dependency scanning are outside the current feature set. Concrete future work is tracked as repository issues rather than promised here.
 
 ## Development
 
 ```bash
-cargo fmt
+cargo fmt -- --check
 cargo clippy --all-targets -- -D warnings
 cargo test
-cargo doc --no-deps --open
 ```
 
-See `CONTRIBUTING.md` for the module structure and command-extension instructions. See `ARCHITECTURE.md` for the control flow.
-
----
-
-## CI
-
-| Job | Targets and checks |
-|---|---|
-| `check` | macOS, Ubuntu, and Windows: formatting, Clippy, tests, and a live round trip |
-| `cross-check` | `x86_64-pc-windows-gnu`, `x86_64-apple-darwin`, `aarch64-apple-darwin`, and `aarch64-unknown-linux-gnu`: `cargo check --all-targets` |
-
----
+The integration suite scaffolds and exercises real C++ projects, so a working `clang++` is required for the full test run.
 
 ## Acknowledgments
 
-Castle is based on [sunless2day/Castle](https://github.com/sunless2day/Castle). The original project was a small C++ project manager written in Rust as a learning project. Its clear structure made this extension possible.
-
----
+Castle is based on [sunless2day/Castle](https://github.com/sunless2day/Castle). The original project established the small Rust/C++ project-manager foundation that this repository extends.
 
 ## License
 
-MIT. See [LICENSE](LICENSE). This project includes work based on [sunless2day/Castle](https://github.com/sunless2day/Castle), which was published as a public learning resource.
+MIT. See [LICENSE](LICENSE).
