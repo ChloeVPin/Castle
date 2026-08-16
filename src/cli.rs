@@ -1,15 +1,15 @@
 //! Command-line interface definition (clap derive).
 //!
 //! Every subcommand maps to a handler in [`crate::commands`]. Help text is
-//! written to match the friendly `Castle:` voice used everywhere else.
+//! written to match the concise `Castle:` voice used everywhere else.
 
 use clap::{Parser, Subcommand};
 
-/// 🏰 Castle — a minimal Cargo-inspired C++ project manager.
+/// Castle — a minimal Cargo-inspired C++ project manager.
 ///
-/// Castle scaffolds, builds, and runs C++ projects with clang (≥ 18) and
-/// C++23 by default. It is intentionally small: think "Cargo's grandchild,
-/// for C++, on clang."
+/// Castle scaffolds, builds, and runs C++ projects with Clang (>= 18) and
+/// C++23 by default. Direct Clang builds are the default; CMake is available
+/// when a project needs it.
 #[derive(Parser, Debug)]
 #[command(name = "castle", version, about, long_about = None, propagate_version = true)]
 pub struct Cli {
@@ -58,7 +58,7 @@ pub enum Command {
         /// Enable MemorySanitizer.
         #[arg(long)]
         msan: bool,
-        /// Treat warnings as errors.
+        /// Enable pedantic warnings (`-Wpedantic`).
         #[arg(long)]
         pedantic: bool,
     },
