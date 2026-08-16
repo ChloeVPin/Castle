@@ -1,6 +1,6 @@
 //! Terminal output helpers.
 //!
-//! A tiny [`Printer`] that wraps every message in a `Castle:` prefix and adds
+//! A tiny [`Printer`] that wraps command messages in a `Castle:` prefix and adds
 //! ANSI color when it is safe to do so. Color is disabled when:
 //! - the `NO_COLOR` environment variable is set (<https://no-color.org/>),
 //! - the `CI` environment variable is set (avoid escape codes in logs),
@@ -18,8 +18,7 @@ const GREEN: &str = "\x1b[32m";
 const YELLOW: &str = "\x1b[33m";
 const CYAN: &str = "\x1b[36m";
 
-/// The Castle voice. Construct one and pass it around; it is zero-cost to clone
-/// state-wise (there is none) but kept as a struct so commands stay uniform.
+/// Shared terminal output for Castle commands.
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Printer;
 
@@ -44,7 +43,7 @@ impl Printer {
         s
     }
 
-    /// A build step in progress, e.g. `Castle: clang compile src/main.cpp`.
+    /// A build step in progress, e.g. `Castle: compile src/main.cpp`.
     pub fn step(&self, label: &str) {
         let prefix = self.paint(true, &[BOLD, CYAN], "Castle:");
         eprintln!("{prefix} {label}");
@@ -62,6 +61,11 @@ impl Printer {
         println!("{prefix} {msg}");
     }
 
+    /// An unprefixed informational line, printed to stdout.
+    pub fn plain(&self, msg: &str) {
+        println!("{msg}");
+    }
+
     /// A warning, printed to stderr.
     pub fn warn(&self, msg: &str) {
         let prefix = self.paint(true, &[BOLD, YELLOW], "Castle:");
@@ -72,10 +76,11 @@ impl Printer {
     /// An error, printed to stderr.
     pub fn error(&self, msg: &str) {
         let prefix = self.paint(true, &[BOLD, RED], "Castle:");
-        eprintln!("{prefix} {msg}");
+        let label = self.paint(true, &[RED], "error:");
+        eprintln!("{prefix} {label} {msg}");
     }
 
-    /// A dimmed hint line (Cargo-style), printed to stderr.
+    /// A dimmed hint line, printed to stderr.
     pub fn hint(&self, msg: &str) {
         let label = self.paint(true, &[DIM], "hint:");
         eprintln!("  {label} {msg}");
@@ -117,9 +122,6 @@ mod tests {
 
     #[test]
     fn paint_returns_the_message() {
-        // `paint` always returns the message (with or without escape codes);
-        // we only assert the input survives, without touching process env
-        // (which is unsafe to mutate in edition 2024 and racy under OnceLock).
         let p = Printer::new();
         let out = p.paint(false, &[BOLD], "castle");
         assert!(out.contains("castle"));
