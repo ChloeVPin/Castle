@@ -12,8 +12,7 @@ compatible; everything below is additive.
 ### Changed — presentation
 - README first screen now states what Castle is, shows a `Castle:` transcript,
   and uses a live CI badge. Origin credit lives under Acknowledgments.
-- Hero tagline is "Cargo for small C++ projects." Added a 1280×640 social
-  preview at `.github/social-preview.png`.
+- README header is the keep, the name, a one-line description, then badges.
 - Errors print `Castle: error: …`, matching the existing `warning:` label.
 - `Cargo.toml` now has description, license, repository, keywords, and
   `rust-version = "1.87"`.

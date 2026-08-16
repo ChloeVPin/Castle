@@ -1,12 +1,16 @@
-<p align="center">
-  <img src="hero.png" alt="Castle — Cargo for small C++ projects" width="480" />
-</p>
+<div align="center">
+  <img src="logo.png" alt="Castle logo" width="144" />
 
-<p align="center">
-  <a href="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml"><img src="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="macOS, Linux, Windows" />
-</p>
+  <h1>Castle</h1>
+
+  <p>Cargo for small C++ projects.</p>
+
+  <p>
+    <a href="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml"><img src="https://github.com/ChloeVPin/Castle/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+    <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT" />
+    <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="macOS, Linux, Windows" />
+  </p>
+</div>
 
 Castle is a Cargo-inspired C++ project manager. It scaffolds, builds, tests, and runs small C++ projects with Clang and C++23 by default.
 
