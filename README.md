@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="Castle logo" width="144" />
+  <img src="assets/readme-icon.svg" alt="Castle" width="120" />
 
   <h1>Castle</h1>
 
