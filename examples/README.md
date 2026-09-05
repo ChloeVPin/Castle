@@ -3,7 +3,7 @@
 Two small projects you can build with Castle right now. They live outside the
 Castle source tree so they don't interfere with `cargo test`.
 
-## `hello` — a single-file binary
+## `hello`: a single-file binary
 
 The default scaffold. Reproduce with:
 
@@ -37,7 +37,7 @@ castle build --asan     # AddressSanitizer build
 castle clean --force    # start over
 ```
 
-## `multi` — a multi-file project using the cmake backend
+## `multi`: a multi-file project using the cmake backend
 
 A two-file project that shows the opt-in CMake backend and a shared header.
 
@@ -75,11 +75,11 @@ int main() {
 ```
 
 The generated `CMakeLists.txt` globs `src/**/*.cpp`, so adding `greet.cpp`
-later requires no manifest edits — just `castle build` again.
+later requires no manifest edits: just `castle build` again.
 
 ## Why these matter
 
-- `hello` proves the zero-config, single-command story: `new → build → run`,
+- `hello` proves the zero-config, single-command story: `new, build, run`,
   with `compile_commands.json` landing for clangd automatically.
 - `multi` shows the escape hatch: when you outgrow the minimal clang backend,
   flip `backend = "cmake"` (or pass `--backend cmake`) and you get a real
