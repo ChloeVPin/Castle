@@ -36,8 +36,8 @@ cargo test
 cargo run -- new example
 ```
 
-See the source and the example project for the complete manifest and command behavior.
+See the source and the [example project](examples/) for the complete manifest and command behavior.
 
 ## License
 
-MIT. See LICENSE.
+MIT. See [LICENSE](LICENSE).
